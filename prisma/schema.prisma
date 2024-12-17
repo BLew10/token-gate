@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Wallet {
+  id        String   @id @default(cuid()) // Unique ID
+  address   String   @unique // Solana wallet address
+  createdAt DateTime @default(now()) // Timestamp for when the wallet is added
+  groups    Group[]  @relation("WalletGroups") // Groups created by this wallet
+  subGroups Group[]  @relation("SubModeratorGroups") // Groups where this wallet is a sub moderator
+}
+
+model Group {
+  id            String          @id @default(cuid()) // Unique ID for the group
+  name          String // Name of the group
+  visibility    GroupVisibility @default(PUBLIC) // Group visibility: public or private
+  tokenCA       String          @unique // Token Contract Address (CA)
+  tokenName     String? // Optional token name, derived from CA
+  threshold     Int // Threshold for the group
+  createdAt     DateTime        @default(now()) // Timestamp for when the group was created
+  moderator     Wallet          @relation("WalletGroups", fields: [moderatorId], references: [id]) // Group moderator
+  moderatorId   String // ID of the moderator wallet
+  subModerators Wallet[]        @relation("SubModeratorGroups") // Sub moderators for the group
+  members       Member[]        @relation("GroupMembers") // Members of the group
+}
+
+model Member {
+  id             String   @id @default(cuid())
+  wallet         String   @unique
+  twitterName    String
+  meetsThreshold Boolean  @default(false)
+  balance        Float?
+  lastChecked    DateTime @default(now())
+  group          Group    @relation("GroupMembers", fields: [groupId], references: [id])
+  groupId        String
+}
+
+enum GroupVisibility {
+  PUBLIC
+  PRIVATE
+}

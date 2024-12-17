@@ -1,3 +1,7 @@
-# token-gate
-
-[Edit in StackBlitz next generation editor ⚡️](https://stackblitz.com/~/github.com/BLew10/token-gate)
+#TODO 
+- handle api calls cleaner
+- ability edit groupp
+- ability to edit members inline
+- multi add members?
+- update button ui
+- deploy
